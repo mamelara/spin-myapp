@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations: {{- include "spin-myapp.annotations" . | nindent 4 }}
+  labels:
+    workload.user.cattle.io/workloadselector: deployment-{{ .Release.Namespace }}-db
+  {{- include "spin-myapp.labels" . | nindent 4 }}
+  namespace: {{ .Release.Namespace }}
+  name: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-{{ .Release.Namespace }}-db
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-{{ .Release.Namespace }}-db
+    spec:
+      containers:
+        - env:
+            - name: MYSQL_DATABASE
+              value: science
+            - name: MYSQL_USER
+              value: user
+            - name: MYSQL_PASSWORD
+              value: pw
+            - name: TZ
+              value: US/Pacific
+            - name: MYSQL_RANDOM_ROOT_PASSWORD
+              value: yes
+          image: mysql:5
+          imagePullPolicy: Always
+          name: db
+          resources: { }
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add:
+                - CHOWN
+                - DAC_OVERRIDE
+                - FOWNER
+                - SETGID
+                - SETUID
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
+          stdin: true
+          tty: true

@@ -1,10 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations: {{- include "spin-myapp.annotations" . | nindent 4 }}
+  annotations:
+    {{- include "spin-myapp.annotations" . | nindent 4 }}
   labels:
     workload.user.cattle.io/workloadselector: deployment-{{ .Release.Namespace }}-db
-  {{- include "spin-myapp.labels" . | nindent 4 }}
+    {{- include "spin-myapp.labels" . | nindent 4 }}
   namespace: {{ .Release.Namespace }}
   name: db
 spec:
